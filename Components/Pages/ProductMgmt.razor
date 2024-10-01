@@ -1,0 +1,234 @@
+﻿@* @page "/productmgmt" *@
+@page "/productmgmt/{mode:int}/{PID:int}"
+@using IT72024BlazorAppDemoCS.DataClasses
+@inject NavigationManager Navigation
+
+@rendermode InteractiveServer
+
+<h3>Product List</h3>
+
+@if(mode > 0)
+{
+    if (mode == 4) 
+    {
+        tempProduct = new();
+        tempProduct.ProductId = products.Max(p => p.ProductId) + 1;
+        tempProduct.ProductName = "Mouse";
+        tempProduct.Rate = 1500;
+        tempProduct.Quantity = 50;
+        Console.WriteLine("Create called");
+    }
+    else
+    {
+        tempProduct = products.FirstOrDefault(p => p.ProductId == PID);
+    }
+    <table width="100%">
+        <tr>
+            <td width="20%">
+                Product ID : 
+            </td>
+            <td>@* 
+                @if(mode == 4)
+                {
+                    <input type="number" id="productid" @bind=@tempProduct.ProductId />
+                }
+                else *@
+                    @tempProduct.ProductId
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Product Name :
+            </td>
+            <td>
+                @if(mode == 2 || mode == 3)
+                {
+                    @tempProduct.ProductName
+                }
+                else
+                {
+                    <input type="text" id="productname" @bind=@tempProduct.ProductName />
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Rate :
+            </td>
+            <td>
+                @if (mode == 2 || mode == 3)
+                {
+                    @tempProduct.Rate
+                }
+                else
+                {
+                    <input type="number" id="rate" @bind=@tempProduct.Rate />
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Quantity :
+            </td>
+            <td>
+                @if (mode == 2 || mode == 3)
+                {
+                    @tempProduct.Quantity
+                }
+                else
+                {
+                    <input type="number" id="productname" @bind=@tempProduct.Quantity />
+                }
+            </td>
+        </tr>
+        <tr>
+            <td align="right">
+                @if (mode == 1)
+                {
+                    <button class="btn btn-success" @onclick="Edit">Update</button>
+                }
+                else if (mode == 2)
+                {
+                    <button class="btn btn-success" @onclick="Cancel">Back to List</button>
+                }
+                else if(mode == 3)
+                {
+                    <button class="btn btn-success" @onclick="Delete">Delete</button>
+                }
+                else if (mode == 4)
+                {
+                    <button class="btn btn-success" @onclick="Add">Save</button>
+                }
+            </td>
+            <td>
+                <button class="btn btn-danger" @onclick="Cancel" >Cancel</button>
+            </td>
+        </tr>
+    </table>
+}
+else
+{
+    <a href="/productmgmt/4/0" role="button">Create</a>
+
+    @if(products.Count > 0)
+    {
+        <table class="table"> 
+            <tr>
+                <th>Product ID </th>
+                <th>Product Name </th>
+                <th>Rate </th>
+                <th>Quantity</th>
+            </tr>
+        @foreach (var product in products)
+        {
+            <tr>
+                <td>
+                     @product.ProductId
+                </td>
+                <td>
+                     @product.ProductName
+                </td>
+                <td>
+                    @product.Rate
+                </td>
+                <td>
+                    @product.Quantity
+                </td>
+                <td>
+                    <a href="/productmgmt/1/@product.ProductId" role="button">Edit</a>
+                </td>
+                <td>
+                    <a href="/productmgmt/2/@product.ProductId" role="button">Detail</a>
+                </td>
+                <td>
+                    <a href="/productmgmt/3/@product.ProductId" role="button">Delete</a>
+                </td>
+            </tr>
+        }
+        </table>
+    }
+}
+@code {
+    private static List<Product> products = new List<Product>();
+
+    [Parameter]
+    public int mode { get; set; }
+    [Parameter]
+    public int PID { get; set; }
+
+    private Product? tempProduct = null;
+
+    protected override void OnInitialized()
+    {
+        Console.WriteLine("OnInitialized");
+        if (products.Count == 0)
+        {
+            products.Add(new Product
+                {
+                    ProductId = 1,
+                    ProductName = "Laptop",
+                    Quantity = 5,
+                    Rate = 50000
+                });
+            products.Add(new Product
+                {
+                    ProductId = 2,
+                    ProductName = "Table",
+                    Quantity = 10,
+                    Rate = 7500
+                });
+
+        }
+
+        // switch (mode)
+        // {
+        //     case 1:
+        //         Edit(PID);
+        //         break;
+        //     case 2:
+        //         Detail(PID);
+        //         break;
+        //     case 3:
+        //         Delete(PID);
+        //         break;
+        //         //default:
+        // }
+        // if (mode.Equals(""))
+        // {
+        //     Console.WriteLine(mode + " : " + PID);
+        // }
+    }
+
+    //mode = 1
+    private void Edit()
+    {
+        Console.WriteLine("Product updated successfully.");
+        Cancel();
+    }
+
+    //mode = 2 and Cancel
+    private void Cancel()
+    {
+        mode = 0;
+        PID = 0;
+        tempProduct = null;
+        Navigation.NavigateTo("/productmgmt/0/0");
+    }
+
+    //mode = 3
+    private void Delete()
+    {
+        products.Remove(tempProduct);
+        Console.WriteLine("Product deleted successfully.");
+        Cancel();
+    }
+
+    //mode = 4
+    private void Add()
+    {
+        products.Add(tempProduct);
+        Console.WriteLine("Product inserted successfully.");
+        Cancel();
+    }
+
+}

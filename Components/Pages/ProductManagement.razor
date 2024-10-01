@@ -1,0 +1,46 @@
+﻿@page "/productmanagement"
+@using IT72024BlazorAppDemoCS.DataClasses
+@using Newtonsoft.Json
+
+<h3>Product List</h3>
+
+@if(products.Count > 0)
+{
+    <label> Product ID - Product Name - Rate - Quantity </label>
+    <br/>
+    foreach (var product in products)
+    {
+        <label id=@product.ProductId>
+            @product.ProductId &nbsp; - &nbsp; @product.ProductName &nbsp;
+            - &nbsp; @product.Rate &nbsp; - &nbsp; @product.Quantity &nbsp;
+        </label>
+        
+        <a href="/product/0/@product.ProductId">Detail</a>
+        <a href="/productedit/@product.ProductId">Edit</a>
+        <a href="/product/1/@product.ProductId">Delete</a>
+        <br/>
+    }
+}
+
+@code {
+    private List<Product> products = new List<Product>();
+
+    private string apiURL = @"https://localhost:7150/api/Products";
+
+
+    protected override void OnInitialized()
+    {
+        Console.WriteLine("OnInitialized");
+        
+        HttpClient client = new HttpClient();
+
+        HttpResponseMessage msg = client.GetAsync(apiURL).Result;
+
+        products = JsonConvert.DeserializeObject<List<Product>>
+            (msg.Content.ReadAsStringAsync().Result);
+
+    }
+
+
+    
+}

@@ -1,0 +1,55 @@
+﻿@page "/product/{Mode:int}/{ProdID:int}"
+@inject NavigationManager Navigation
+
+@rendermode InteractiveServer
+
+@using IT72024BlazorAppDemoCS.DataClasses
+@using Newtonsoft.Json
+@* @using System.Text.Json *@
+
+<h3>Product Detail</h3>
+
+@product.ProductId
+<br/>
+@product.ProductName
+<br />
+@product.Rate
+<br />
+@product.Quantity
+<br/>
+@if(Mode == 1)
+{
+    <button id="productdelete" @onclick="Delete"> Delete </button>
+}
+<a href="/productmanagement">Back to List</a>
+
+@code {
+    [Parameter]
+    public int ProdID { get; set; }
+
+    [Parameter]
+    public int Mode { get; set; }
+
+    public Product? product = new();
+
+    private string apiURL = @"https://localhost:7150/api/Products";
+
+    HttpClient client = new HttpClient();
+
+
+    private void Delete()
+    {
+        Console.WriteLine("Delete called");
+        HttpResponseMessage msg = client.DeleteAsync(apiURL + "/" + ProdID).Result;
+        Navigation.NavigateTo("/productmanagement");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        HttpResponseMessage msg = client.GetAsync(apiURL + "/" + ProdID).Result;
+        product = JsonConvert.DeserializeObject<Product>(msg.Content.ReadAsStringAsync().Result);
+        await base.OnInitializedAsync();
+    }
+
+
+}

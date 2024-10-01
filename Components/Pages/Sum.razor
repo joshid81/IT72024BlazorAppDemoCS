@@ -1,0 +1,52 @@
+﻿@page "/sum"
+
+@rendermode InteractiveServer
+
+<PageTitle> Sum of Two Numbers </PageTitle>
+
+<h3>Sum of Two Numbers</h3>
+
+Value of X <input type="number" id="x" @bind=@x />
+<br/>
+Value of Y <input type="number" id="y" @bind=@y />
+<br />
+<button @onclick="DoSum" >Add</button>
+<br />
+Answer is @ans
+
+<hr/>
+<br/>
+
+<table>
+    <tr>
+        <th>X </th>
+        <th>Y </th>
+        <th>Ans</th>
+    </tr>
+    @foreach (var item in result)
+    {
+        <tr>
+            <td>@item.Item1</td>
+            <td>@item.Item2</td>
+            <td>@item.Item3</td>
+        </tr>
+    }
+    
+</table>
+
+@code {
+
+    private int x;
+    private int y;
+    private int ans;
+
+    private void DoSum()
+    {
+        ans = x + y;
+        result.Add((x, y, ans));
+    }
+
+    private List<(int, int, int)> result = new();
+
+
+}

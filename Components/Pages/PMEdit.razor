@@ -1,0 +1,53 @@
+﻿@page "/productedit/{ProdId:int}"
+@using IT72024BlazorAppDemoCS.DataClasses
+@using Newtonsoft.Json
+@using System.Text
+@inject NavigationManager Navigation
+
+@rendermode InteractiveServer
+
+<h3>PMEdit</h3>
+
+<input type="number" id="productid" disabled @bind=product.ProductId />
+<br/>
+<input type="text" id="productname" @bind=product.ProductName />
+<br />
+<input type="number" id="rate" @bind=product.Rate />
+<br />
+<input type="number" id="quantity" @bind=product.Quantity />
+<br />
+<button id="save" @onclick="UpdateProduct" >Update</button>
+
+@code {
+    [Parameter]
+    public int ProdId { get; set; }
+
+    public Product? product = new();
+
+    private string apiURL = @"https://localhost:7150/api/Products";
+
+    HttpClient client = new HttpClient();
+
+    private void UpdateProduct()
+    {
+        HttpContent content = new StringContent(
+                    JsonConvert.SerializeObject(product),
+                    Encoding.UTF8, "application/json"
+                    );
+
+        HttpResponseMessage msg = client.PutAsync(apiURL + "/" + ProdId, content).Result;
+        Navigation.NavigateTo("/productmanagement");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        HttpResponseMessage msg = client.GetAsync(apiURL + "/" + ProdId).Result;
+
+        product = JsonConvert.DeserializeObject<Product>
+            (msg.Content.ReadAsStringAsync().Result);
+
+        await base.OnInitializedAsync();
+    }
+
+   
+}
